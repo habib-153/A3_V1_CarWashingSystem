@@ -8,7 +8,7 @@ const signUp = catchAsync(async (req, res) => {
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: 'User created successfully',
+        message: 'User registered successfully',
         data: user
     })
 })
@@ -21,7 +21,7 @@ const login = catchAsync(async(req, res)=>{
         statusCode: httpStatus.OK,
         message: 'User logged in successfully',
         token: jwtToken,
-        data: {user, jwtToken}
+        data: user
     })
 })
 
