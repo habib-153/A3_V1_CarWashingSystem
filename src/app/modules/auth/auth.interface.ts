@@ -1,4 +1,4 @@
-export type TAuth = {
+export type TUserLogin = {
     email: string;
     password: string;
 }
