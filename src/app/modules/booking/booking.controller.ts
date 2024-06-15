@@ -16,6 +16,29 @@ const createBooking = catchAsync(async (req, res) => {
     })
 })
 
+const getAllBookings = catchAsync(async(req, res) => {
+    const result = await BookingService.getAllBookingsFromDB()
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'All bookings retrieved successfully',
+        data: result
+    })
+})
+
+const getUserBookings = catchAsync( async(req, res) =>{
+    const user = req.user;
+    const result = await BookingService.getUserBookingsFromDB(user as JwtPayload)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'User bookings retrieved successfully',
+        data: result
+    })
+})
+
 export const BookingController = {
-    createBooking
+    createBooking, getAllBookings, getUserBookings
 }

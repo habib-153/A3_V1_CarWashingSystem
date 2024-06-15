@@ -7,6 +7,7 @@ import { Service } from '../service/service.model';
 import { Slot } from '../slot/slot.model';
 import { ServiceBooking } from './booking.model';
 import { TBooking } from './booking.interface';
+import { custom } from 'zod';
 
 const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
   const session = await mongoose.startSession();
@@ -25,8 +26,9 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
     if (!serviceData)
       throw new AppError(httpStatus.NOT_FOUND, 'Service not found');
 
-    const slotData = await Slot.findById({
+    const slotData = await Slot.findOne({
       _id: payload.slotId,
+      service: payload.serviceId,
     }).session(session);
     if (!slotData)
       throw new AppError(httpStatus.NOT_FOUND, 'Slot does not exist');
@@ -41,15 +43,11 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
       [{ ...payload, customer: userData._id }],
       { session: session },
     );
+    const result = ServiceBooking.findById(booking[0]._id).populate('service').populate('customer')
     await session.commitTransaction();
     session.endSession();
-
-    const result = await ServiceBooking.findById(booking[0]._id)
-      .populate('customer')
-      .populate('slot')
-      .populate('service');
-    console.log('result', result);
-    return result;
+    
+    return result
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -57,6 +55,19 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
   }
 };
 
+  const getAllBookingsFromDB = async() =>{
+    const result = await ServiceBooking.find().populate('serviceId customer slotId')
+    return result
+  }
+
+  const getUserBookingsFromDB = async(payload: JwtPayload) =>{
+    const user = await User.findOne({ email: payload?.email})
+
+    const result = await ServiceBooking.find({customer: user?._id}).populate('serviceId slotId')
+    return result
+  }
 export const BookingService = {
-  createBookingIntoDB,
-};
+    createBookingIntoDB,
+    getAllBookingsFromDB,
+    getUserBookingsFromDB
+}
