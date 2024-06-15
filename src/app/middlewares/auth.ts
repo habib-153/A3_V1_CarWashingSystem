@@ -8,6 +8,16 @@ import catchAsync from '../utils/catchAsync';
 import sendResponse from '../utils/sendResponse';
 import { NextFunction, Request, Response } from 'express';
 
+//import { JwtPayload } from 'jsonwebtoken';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtPayload;
+    }
+  }
+}
+
 const auth = (...userRoles: TRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction)=> {
     try {
@@ -33,7 +43,7 @@ const auth = (...userRoles: TRole[]) => {
       // console.log('decoded', decoded)
       // console.log(token)
       
-      // req.user = decoded as JwtPayload
+      req.user = decoded as JwtPayload
       next()
     } catch (err) {
         sendResponse(res,{
