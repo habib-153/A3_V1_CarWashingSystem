@@ -43,10 +43,10 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
       [{ ...payload, customer: userData._id }],
       { session: session },
     );
-    const result = ServiceBooking.findById(booking[0]._id).populate('service').populate('customer')
     await session.commitTransaction();
     session.endSession();
-    
+
+    const result = await ServiceBooking.findById(booking[0]._id).populate('serviceId customer slotId')
     return result
   } catch (error) {
     await session.abortTransaction();
