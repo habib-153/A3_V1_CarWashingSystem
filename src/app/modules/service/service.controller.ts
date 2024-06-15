@@ -17,24 +17,44 @@ const createService = catchAsync(async (req, res) => {
 const getAllServices = catchAsync(async (req, res) => {
     const services = await ServiceServices.getAllServicesFromDB()
 
-    sendResponse(res, {
+    if(services.length > 0){
+        sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: 'Services retrieved successfully',
         data: services
     })
+    }
+    else{
+        sendResponse(res,{
+            success:false,
+            statusCode: httpStatus.NOT_FOUND,
+            message:'No Data Found',
+            data: []
+        })
+    }
 })
 
 const getSingleService = catchAsync(async (req, res) => {
     const { id} = req.params
 
     const service = await ServiceServices.getSingleServiceFromDB(id)
-    sendResponse(res,{
+    if(service){
+        sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: 'Service retrieved successfully',
         data: service
     })
+    }
+    else{
+        sendResponse(res,{
+            success:false,
+            statusCode: httpStatus.NOT_FOUND,
+            message:'No Data Found',
+            data: []
+        })
+    }
 })
 
 const updateService = catchAsync(async (req, res) => {

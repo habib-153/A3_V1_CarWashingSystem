@@ -19,24 +19,43 @@ const createBooking = catchAsync(async (req, res) => {
 const getAllBookings = catchAsync(async(req, res) => {
     const result = await BookingService.getAllBookingsFromDB()
 
-    sendResponse(res, {
+    if(result.length > 0){
+        sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: 'All bookings retrieved successfully',
         data: result
     })
+    }
+    else{
+        sendResponse(res,{
+            success:false,
+            statusCode: httpStatus.NOT_FOUND,
+            message:'No Data Found',
+            data: []
+        })
+    }
 })
 
 const getUserBookings = catchAsync( async(req, res) =>{
     const user = req.user;
     const result = await BookingService.getUserBookingsFromDB(user as JwtPayload)
-
-    sendResponse(res, {
+    if(result.length > 0){
+        sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
         message: 'User bookings retrieved successfully',
         data: result
     })
+    }
+    else{
+        sendResponse(res,{
+            success:false,
+            statusCode: httpStatus.NOT_FOUND,
+            message:'No Data Found',
+            data: []
+        })
+    }
 })
 
 export const BookingController = {
