@@ -10,7 +10,7 @@ class QueryBuilder<T>{
     }
 
     search(searchableFields: string[]){
-        const searchTerm =  this?.query?.date
+        const searchTerm =  this?.query?.searchTerm
         if(searchTerm){
             this.modelQuery = this.modelQuery.find({
                 $or: searchableFields.map(field => ({
@@ -26,10 +26,43 @@ class QueryBuilder<T>{
     filter(){
         const queryObj = { ...this.query }
         //filtering
-        const excludeFields = ['date'];
+        const excludeFields = ['searchTerm', 'sort', 'page', 'limit', 'fields'];
         excludeFields.forEach((el) => delete queryObj[el]);
+
         if(queryObj.serviceId){
             this.modelQuery = this.modelQuery.find({service: queryObj?.serviceId} as FilterQuery<T>)
+        }
+        //console.log(queryObj)
+        if (queryObj.filters) {
+            // console.log(queryObj.filters)
+            const filters = (queryObj.filters as string).split(',')
+            // console.log(filters)
+
+            filters?.forEach((str: string) => {
+                const [key, value] = str.split(' ');
+                if (key === 'less' && value === 'than') {
+                    const duration = parseInt(str.split(' ')[2], 10);
+                    if (!isNaN(duration)) {
+                        // console.log(duration)
+                        this.modelQuery = this.modelQuery.find({ duration: { $lte: duration } } as FilterQuery<T>);
+                    }
+                }
+                if (key === 'more' && value === 'than') {
+                    const duration = parseInt(str.split(' ')[2], 10);
+                    if (!isNaN(duration)) {
+                        this.modelQuery = this.modelQuery.find({ duration: { $gt: duration } } as FilterQuery<T>);
+                    }
+                }
+            })
+            // queryObj.filters?.forEach((filter: string) => {
+                // const [key, value] = filter.split(' ');
+                // if (key === 'less' && value === 'than') {
+                //     const duration = parseInt(filter.split(' ')[2], 10);
+                //     if (!isNaN(duration)) {
+                //         this.modelQuery = this.modelQuery.find({ duration: { $lt: duration } } as FilterQuery<T>);
+                //     }
+                // }
+            // });
         }
         //console.log(this.modelQuery)
         return this

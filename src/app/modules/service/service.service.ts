@@ -2,14 +2,24 @@ import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { TService } from './service.interface';
 import { Service } from './service.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createServiceIntoDB = async (payload: TService) => {
   const result = await Service.create(payload);
   return result;
 };
 
-const getAllServicesFromDB = async () => {
-  const result = await Service.find();
+const getAllServicesFromDB = async (query: Record<string, unknown>) => {
+  const searchableFields = ['name', 'description']
+
+  const services = new QueryBuilder(Service.find(), query)
+  .search(searchableFields)
+  .filter()
+  .sort()
+  .paginate()
+  .fields()
+
+  const result = await services.modelQuery
   return result;
 };
 
