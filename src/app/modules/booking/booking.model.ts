@@ -11,6 +11,11 @@ const serviceBookingSchema = new Schema<TBooking>({
     vehicleBrand: { type: String, required: true },
     manufacturingYear: { type: Number, required: true },
     registrationPlate: { type: String, required: true },
+    transactionId: { type: String, required: true },
+    address: { type: String , required: true},
+    phone: { type: String , required: true},
+    paymentStatus: { type: String , required: true},
+    price: { type: Number, required: true }
 },
 {
     timestamps: true

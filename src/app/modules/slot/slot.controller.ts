@@ -48,9 +48,9 @@ const getAvailableSlots = catchAsync(async (req, res) => {
     });
   } else {
     sendResponse(res, {
-      success: false,
-      statusCode: httpStatus.NOT_FOUND,
-      message: 'No Data Found',
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'No Data Available',
       data: [],
     });
   }

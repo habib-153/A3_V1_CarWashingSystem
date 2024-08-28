@@ -10,7 +10,9 @@ export type TBooking = {
     vehicleBrand: string
     manufacturingYear: number
     registrationPlate: string
-    address?: string
-    phone?: string
-    paymentStatus?: string
+    transactionId: string
+    address: string
+    phone: string
+    paymentStatus: string
+    price: number
 }

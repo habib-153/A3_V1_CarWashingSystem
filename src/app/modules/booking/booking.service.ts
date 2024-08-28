@@ -35,7 +35,7 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
     if (slotData.isBooked === 'booked')
       throw new AppError(httpStatus.BAD_REQUEST, 'This slot is already booked');
 
-    const transactionId = `TXN-${payload.serviceId}`
+    const transactionId = `TXN-${payload.slotId}`
     const paymentInfo = {
       transactionId,
       customerName: userData.name,
@@ -52,7 +52,7 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
     }).session(session);
 
     const booking = await ServiceBooking.create(
-      [{ ...payload, customer: userData._id }],
+      [{ ...payload, customer: userData._id, price: serviceData.price, transactionId }],
       { session: session },
     );
     await session.commitTransaction();
