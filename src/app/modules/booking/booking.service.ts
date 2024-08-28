@@ -7,7 +7,7 @@ import { Service } from '../service/service.model';
 import { Slot } from '../slot/slot.model';
 import { ServiceBooking } from './booking.model';
 import { TBooking } from './booking.interface';
-import { custom } from 'zod';
+import { initiatePayment } from '../../utils/payment';
 
 const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
   const session = await mongoose.startSession();
@@ -35,6 +35,18 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
     if (slotData.isBooked === 'booked')
       throw new AppError(httpStatus.BAD_REQUEST, 'This slot is already booked');
 
+    const transactionId = `TXN-${payload.serviceId}`
+    const paymentInfo = {
+      transactionId,
+      customerName: userData.name,
+      customerEmail: userData.email,
+      customerPhone: payload.phone,
+      customerAddress: payload.address,
+      price: serviceData.price
+    }
+
+    const payment = await initiatePayment(paymentInfo)
+
     await Slot.findByIdAndUpdate(payload.slotId, {
       isBooked: 'booked',
     }).session(session);
@@ -47,7 +59,7 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
     session.endSession();
 
     const result = await ServiceBooking.findById(booking[0]._id).populate('serviceId customer slotId')
-    return result
+    return {result, payment}
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

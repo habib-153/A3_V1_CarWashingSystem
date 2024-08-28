@@ -10,4 +10,8 @@ export default {
   jwt_expires_in: process.env.JWT_EXPIRE,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
   NODE_ENV: process.env.NODE_ENV,
+  payment_url: process.env.PAYMENT_URL,
+  store_id: process.env.STORE_ID,
+  signature_key: process.env.SIGNATURE_KEY,
+  payment_verify_url: process.env.PAYMENT_VERIFY_URL,
 };

@@ -4,7 +4,6 @@ import { Service } from '../service/service.model';
 import { TSlot } from './slot.interface';
 import { Slot } from './slot.model';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { date } from 'zod';
 
 const createSlotIntoDB = async (payload: TSlot) => {
   const service = await Service.findById(payload.service);
@@ -30,6 +29,11 @@ const createSlotIntoDB = async (payload: TSlot) => {
   return result;
 };
 
+const getSingleSlotFromDB = async (id: string) => {
+  const result = await Slot.findById(id);
+  return result;
+};
+
 const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
   const searchField = ['date'];
   const slotQuery = new QueryBuilder(Slot.find().populate('service'), query)
@@ -42,5 +46,6 @@ const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
 
 export const SlotService = {
   createSlotIntoDB,
-  getAvailableSlotsFromDB
+  getAvailableSlotsFromDB,
+  getSingleSlotFromDB,
 };
