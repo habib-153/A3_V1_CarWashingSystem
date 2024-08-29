@@ -26,17 +26,18 @@ class QueryBuilder<T>{
     filter(){
         const queryObj = { ...this.query }
         //filtering
-        const excludeFields = ['searchTerm', 'sort', 'page', 'limit', 'fields', 'date'];
+        const excludeFields = ['searchTerm', 'sort', 'page', 'limit', 'fields'];
         excludeFields.forEach((el) => delete queryObj[el]);
         
         if(queryObj.serviceId){
             this.modelQuery = this.modelQuery.find({service: queryObj?.serviceId} as FilterQuery<T>)
         }
-        //console.log(queryObj)
+        if(queryObj.date){
+            this.modelQuery = this.modelQuery.find({date: queryObj?.date} as FilterQuery<T>)
+        }
+        
         if (queryObj.filters) {
-            // console.log(queryObj.filters)
             const filters = (queryObj.filters as string).split(',')
-            // console.log(filters)
 
             filters?.forEach((str: string) => {
                 const [key, value] = str.split(' ');
@@ -54,15 +55,6 @@ class QueryBuilder<T>{
                     }
                 }
             })
-            // queryObj.filters?.forEach((filter: string) => {
-                // const [key, value] = filter.split(' ');
-                // if (key === 'less' && value === 'than') {
-                //     const duration = parseInt(filter.split(' ')[2], 10);
-                //     if (!isNaN(duration)) {
-                //         this.modelQuery = this.modelQuery.find({ duration: { $lt: duration } } as FilterQuery<T>);
-                //     }
-                // }
-            // });
         }
         //console.log(this.modelQuery)
         return this
@@ -77,7 +69,7 @@ class QueryBuilder<T>{
 
     paginate(){
         const page = Number(this?.query?.page) || 1
-        const limit = Number(this?.query?.limit) || 5
+        const limit = Number(this?.query?.limit) || 10
         const skip = (page - 1) * limit
 
         this.modelQuery = this.modelQuery.skip(skip).limit(limit)
@@ -90,6 +82,20 @@ class QueryBuilder<T>{
         this.modelQuery = this.modelQuery.select(fields)
 
         return this
+    }
+
+    async countTotal(){
+        const totalQueries = this.modelQuery.getFilter()
+        const total = await this.modelQuery.model.countDocuments(totalQueries)
+        const page = Number(this?.query?.page) || 1
+        const limit = Number(this?.query?.limit) || 10
+        const totalPage = Math.ceil(total / limit)
+        return {
+            total,
+            page,
+            limit,
+            totalPage
+        }
     }
 }
 

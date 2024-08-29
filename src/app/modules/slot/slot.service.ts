@@ -25,7 +25,6 @@ const createSlotIntoDB = async (payload: TSlot) => {
   );
 
   const result = await Slot.create(slots);
-  //console.log(slots);
   return result;
 };
 
@@ -36,6 +35,7 @@ const getSingleSlotFromDB = async (id: string) => {
 
 const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
   const searchField = ['date'];
+  
   const slotQuery = new QueryBuilder(Slot.find().populate('service'), query)
     .search(searchField)
     .filter();
@@ -44,8 +44,26 @@ const getAvailableSlotsFromDB = async (query: Record<string, unknown>) => {
   return result
 };
 
+const updateSlotStatusIntoDB = async(id: string, payload: Record<string, unknown>) => {
+  const isSlotExists = await Slot.findById(id);
+
+  if (!isSlotExists) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This slot is not found !');
+  }
+
+  //const requestedStatus = payload.status;
+
+  if (isSlotExists.isBooked === 'booked') {
+    throw new AppError(httpStatus.BAD_REQUEST, 'You can not change the status of a BOOKED Slot !');
+  }
+  
+  const result = await Slot.findByIdAndUpdate(id, payload, { new: true });
+  return result;
+}
+
 export const SlotService = {
   createSlotIntoDB,
   getAvailableSlotsFromDB,
   getSingleSlotFromDB,
+  updateSlotStatusIntoDB
 };

@@ -28,8 +28,8 @@ const getAllServices = catchAsync(async (req, res) => {
     }
     else{
         sendResponse(res,{
-            success:false,
-            statusCode: httpStatus.NOT_FOUND,
+            success:true,
+            statusCode: httpStatus.OK,
             message:'No Data Found',
             data: []
         })
@@ -60,7 +60,6 @@ const getSingleService = catchAsync(async (req, res) => {
 
 const updateService = catchAsync(async (req, res) => {
     const { id } = req.params
-
     const service = await ServiceServices.updateServiceIntoDB(id, req.body)
 
     sendResponse(res, {
