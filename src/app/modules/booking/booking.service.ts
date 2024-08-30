@@ -75,7 +75,7 @@ const createBookingIntoDB = async (payload: TBooking, user: JwtPayload) => {
   const getUserBookingsFromDB = async(payload: JwtPayload) =>{
     const user = await User.findOne({ email: payload?.email})
 
-    const result = await ServiceBooking.find({customer: user?._id}).populate('serviceId slotId')
+    const result = await ServiceBooking.find({customer: user?._id}).populate('serviceId  slotId')
     return result
   }
 export const BookingService = {

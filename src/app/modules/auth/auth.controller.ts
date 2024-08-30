@@ -48,9 +48,21 @@ const updateUser = catchAsync(async(req, res)=>{
     })
 })
 
+const getUserByEmail = catchAsync(async(req, res)=>{
+    const { email } = req.params
+    const result = await AuthService.getUserFromDB(email)
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'User retrieved successfully',
+        data: result
+    })
+})
+
 export const AuthController = {
     signUp,
     login,
     getAllUsers,
-    updateUser
+    updateUser,
+    getUserByEmail
 }

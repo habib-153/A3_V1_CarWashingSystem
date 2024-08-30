@@ -55,7 +55,13 @@ const getAllUserFromDB = async (query: Record<string, unknown>) => {
   return {result, meta};
 };
 
+const getUserFromDB = async (email: string) => {
+  const result = await User.findOne({email: email})
+  return result;
+}
+
 const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
+  
   const result = await User.findByIdAndUpdate(id, payload, {
     new: true,
   });
@@ -67,4 +73,5 @@ export const AuthService = {
   userLogIn,
   getAllUserFromDB,
   updateUserIntoDB,
+  getUserFromDB,
 };

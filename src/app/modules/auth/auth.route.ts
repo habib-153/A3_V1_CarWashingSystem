@@ -13,6 +13,7 @@ router.post('/auth/login', validateRequest(AuthValidation.loginValidationSchema)
 
 router.get('/users', auth('admin'), AuthController.getAllUsers)
 
-router.put('/users/:id', auth('admin'), AuthController.updateUser)
+router.get('/users/:email', auth('user', 'admin'), AuthController.getUserByEmail)
+router.put('/users/:id', auth('admin', 'user'), AuthController.updateUser)
 
 export const AuthRoutes = router
