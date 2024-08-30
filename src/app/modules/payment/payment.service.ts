@@ -25,7 +25,7 @@ const confirmationService = async (transactionId: string, status: string) => {
     message = 'Payment Failed!';
   }
 
-  const filePath = join(__dirname, '../../views/confirmation.html');
+  const filePath = join(__dirname, '../../../../confirmation.html');
   let template = readFileSync(filePath, 'utf-8');
 
   template = template.replace('{{message}}', message);
