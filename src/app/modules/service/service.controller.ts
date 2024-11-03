@@ -2,9 +2,15 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { ServiceServices } from "./service.service";
+import AppError from "../../errors/AppError";
+import { TImageFiles } from "../../interface/image.interface";
 
 const createService = catchAsync(async (req, res) => {
-    const service = await ServiceServices.createServiceIntoDB(req.body)
+    if(!req.files){
+        throw new AppError(400, 'Please Upload an Image');
+    }
+
+    const service = await ServiceServices.createServiceIntoDB(req.body, req.files as TImageFiles)
 
     sendResponse(res, {
         success: true,
@@ -60,7 +66,7 @@ const getSingleService = catchAsync(async (req, res) => {
 
 const updateService = catchAsync(async (req, res) => {
     const { id } = req.params
-    const service = await ServiceServices.updateServiceIntoDB(id, req.body)
+    const service = await ServiceServices.updateServiceIntoDB(id, req.body, req.files as TImageFiles)
 
     sendResponse(res, {
         success: true,
