@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { AuthService } from "./auth.service";
+import { TUser } from "../user/user.interface";
 
 const signUp = catchAsync(async (req, res) => {
     const user = await AuthService.userSignUp(req.body)
@@ -59,10 +60,21 @@ const getUserByEmail = catchAsync(async(req, res)=>{
     })
 })
 
+const getUserStats = catchAsync(async(req, res)=>{
+    const result = await AuthService.getUserStats(req.user as TUser)
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'User stats retrieved successfully',
+        data: result
+    })
+})
+
 export const AuthController = {
     signUp,
     login,
     getAllUsers,
     updateUser,
-    getUserByEmail
+    getUserByEmail,
+    getUserStats
 }

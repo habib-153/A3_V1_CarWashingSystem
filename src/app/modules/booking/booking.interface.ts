@@ -15,4 +15,6 @@ export type TBooking = {
     phone: string
     paymentStatus: string
     price: number
+    createdAt?: Date
+    updatedAt?: Date
 }

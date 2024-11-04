@@ -12,6 +12,7 @@ router.post('/auth/signup', validateRequest(UserValidation.createUserValidationS
 router.post('/auth/login', validateRequest(AuthValidation.loginValidationSchema), AuthController.login)
 
 router.get('/users', auth('admin'), AuthController.getAllUsers)
+router.get('/stats', auth('user', 'admin'), AuthController.getUserStats)
 
 router.get('/users/:email', auth('user', 'admin'), AuthController.getUserByEmail)
 router.put('/users/:id', auth('admin', 'user'), AuthController.updateUser)

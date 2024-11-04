@@ -7,6 +7,7 @@ import { User } from '../user/user.model';
 import { TUserLogin } from './auth.interface';
 import config from '../../config';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { ServiceBooking } from '../booking/booking.model';
 
 const userSignUp = async (payload: TUser) => {
   const result = await User.create(payload);
@@ -68,10 +69,69 @@ const updateUserIntoDB = async (payload: Partial<TUser>, id: string) => {
 
   return result;
 };
+
+const getUserStats = async (user: TUser) => {
+  const email = user.email;
+  const userData = await User.findOne({ email: email });
+  if (!userData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  const bookings = await ServiceBooking.find({ customer: userData._id });
+
+  const totalSpend = bookings.reduce((sum, booking) => sum + booking.price, 0);
+  const totalBookings = bookings.length;
+
+  const monthlyStats = bookings.reduce((acc: { [key: string]: { spend: number; bookings: number } }, booking) => {
+    const month = booking?.createdAt?.getMonth();
+    const year = booking?.createdAt?.getFullYear();
+    const key = `${year}-${month}`;
+
+    if (!acc[key]) {
+      acc[key] = { spend: 0, bookings: 0 };
+    }
+
+    acc[key].spend += booking.price;
+    acc[key].bookings += 1;
+
+    return acc;
+  }, {});
+
+  const uniqueServices = new Set(bookings.map(booking => booking.serviceId.toString()));
+  const totalServicesAvailed = uniqueServices.size;
+
+  const serviceFrequency: Record<string, number> = bookings.reduce((acc: Record<string, number>, booking) => {
+    const serviceId = booking.serviceId.toString();
+    if (!acc[serviceId]) {
+      acc[serviceId] = 0;
+    }
+    acc[serviceId] += 1;
+    return acc;
+  }, {});
+
+  const mostFrequentService = Object.keys(serviceFrequency).reduce((a, b) => serviceFrequency[a] > serviceFrequency[b] ? a : b, '');
+
+  const averageSpendPerBooking = totalSpend / totalBookings;
+
+  const mostRecentBooking = bookings.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))[0];
+
+  const result = {
+    totalSpend,
+    totalBookings,
+    monthlyStats,
+    totalServicesAvailed,
+    mostFrequentService,
+    averageSpendPerBooking,
+    mostRecentBooking,
+  }
+  return result;
+};
+
 export const AuthService = {
   userSignUp,
   userLogIn,
   getAllUserFromDB,
   updateUserIntoDB,
   getUserFromDB,
+  getUserStats
 };

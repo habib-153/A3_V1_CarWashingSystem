@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
+const user_validation_1 = require("../user/user.validation");
+const auth_controller_1 = require("./auth.controller");
+const auth_validation_1 = require("./auth.validation");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const router = express_1.default.Router();
+router.post('/auth/signup', (0, validateRequest_1.default)(user_validation_1.UserValidation.createUserValidationSchema), auth_controller_1.AuthController.signUp);
+router.post('/auth/login', (0, validateRequest_1.default)(auth_validation_1.AuthValidation.loginValidationSchema), auth_controller_1.AuthController.login);
+router.get('/users', (0, auth_1.default)('admin'), auth_controller_1.AuthController.getAllUsers);
+router.get('/stats', (0, auth_1.default)('user', 'admin'), auth_controller_1.AuthController.getUserStats);
+router.get('/users/:email', (0, auth_1.default)('user', 'admin'), auth_controller_1.AuthController.getUserByEmail);
+router.put('/users/:id', (0, auth_1.default)('admin', 'user'), auth_controller_1.AuthController.updateUser);
+exports.AuthRoutes = router;
